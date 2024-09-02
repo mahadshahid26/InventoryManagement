@@ -1,0 +1,138 @@
+<div class="container">
+    <div class="row">
+      
+      <!-- Form Section -->
+      <div class="col-md-4">
+        <div class="toast-container">
+            <ngb-toast *ngIf="showToastFlag" [ngClass]="{'toast-success': toastType === 'success', 'toast-error': toastType === 'error'}" [autohide]="true" [delay]="3000" (hidden)="showToastFlag = false">
+              {{ toastMessage }}
+            </ngb-toast>
+          </div>
+
+        <form (ngSubmit)="saveProduct()" #productForm="ngForm">
+          <div class="form-group">
+            <label for="name">Product Name</label>
+            <input type="text" class="form-control" id="name" required [(ngModel)]="newProduct.name" name="name">
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" required [(ngModel)]="newProduct.description" name="description"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" [disabled]="!productForm.form.valid">{{ isEditing ? 'Update Product' : 'Create Product' }}</button>
+        </form>
+      </div>
+
+      <!-- Table Section -->
+      <div *ngIf="isLoading" class="d-flex justify-content-center my-3">
+        <div class="spinner-border" role="status">
+        </div>
+      </div>
+      <div *ngIf="products.length>0" class="col-md-8">
+        <table class="table outer-bordered" *ngIf="products">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Description</th>
+              <th scope="col">Quantity In Store</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of products">
+              <td>{{ product.name }}</td>
+              <td>{{ product.description }}</td>
+              <td>{{ product.quantityInStock }}</td>
+              <td>
+                <div class="btn-group" role="group" aria-label="Product Actions">
+                  <button class="btn btn-primary mx-1" (click)="openUpdateModal(product)">Edit</button>
+                  <button class="btn btn-danger mx-1" (click)="deleteProduct(product.productID)">Delete</button>
+                  <button class="btn btn-outline-success mx-1" (click)="openSaleModal(product)">Sale</button>
+                  <button class="btn btn-outline-info mx-1" (click)="openPurchaseModal(product)">Purchase</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+  
+      <!-- Sale Modal -->
+      <ng-template #saleModal let-modal>
+        <div class="modal-header">
+          <h4 class="modal-title">Create Sale</h4>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="createSale(modal)">
+            <div class="form-group">
+              <label for="productName">Product Name</label>
+              <input type="text" class="form-control" id="productName" [(ngModel)]="selectedProduct.name" name="productName" readonly>
+            </div>
+            <div class="form-group">
+              <label for="quantity">Quantity</label>
+              <input type="number" class="form-control" id="quantity" [(ngModel)]="saleData.quantitySold" name="quantity" required>
+            </div>
+            <div class="form-group">
+              <label for="totalPrice">Total Price</label>
+              <input type="number" class="form-control" id="totalPrice" [(ngModel)]="saleData.totalPrice" name="totalPrice" required>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button type="submit" class="btn btn-primary">Create Sale</button>
+              <button type="button" class="btn btn-secondary" (click)="modal.dismiss('Close click')">Close</button>
+            </div>
+          </form>
+        </div>
+      </ng-template>
+
+       <!-- Purchase Modal -->
+       <ng-template #purchaseModal let-modal>
+        <div class="modal-header">
+          <h4 class="modal-title">Create Purchase</h4>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="createPurchase(modal)">
+            <div class="form-group">
+              <label for="productName">Product Name</label>
+              <input type="text" class="form-control" id="productName" [(ngModel)]="selectedProduct.name" name="productName" readonly>
+            </div>
+            <div class="form-group">
+              <label for="quantity">Quantity</label>
+              <input type="number" class="form-control" id="quantity" [(ngModel)]="purchaseData.quantityPurchased" name="quantity" required>
+            </div>
+            <div class="form-group">
+              <label for="totalPrice">Total Cost</label>
+              <input type="number" class="form-control" id="totalPrice" [(ngModel)]="purchaseData.totalCost" name="totalPrice" required>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button type="submit" class="btn btn-primary">Create Purchase</button>
+              <button type="button" class="btn btn-secondary" (click)="modal.dismiss('Close click')">Close</button>
+            </div>
+          </form>
+        </div>
+      </ng-template>
+
+      <!-- Update Product Modal -->
+<ng-template #updateModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Update Product</h4>
+  </div>
+  <div class="modal-body">
+    <form (ngSubmit)="updateProduct(modal)" #updateForm="ngForm">
+      <div class="form-group">
+        <label for="name">Product Name</label>
+        <input type="text" class="form-control" id="name" required [(ngModel)]="selectedProduct.name" name="name">
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea class="form-control" id="description" required [(ngModel)]="selectedProduct.description" name="description"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="quantity">Quantity In Store</label>
+        <input type="number" class="form-control" id="quantity" required [(ngModel)]="selectedProduct.quantityInStock" name="quantity">
+      </div>
+      <div class="d-flex justify-content-between">
+        <button type="submit" class="btn btn-primary" [disabled]="!updateForm.form.valid">Update Product</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.dismiss('Close click')">Close</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+  

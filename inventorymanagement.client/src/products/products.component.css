@@ -1,0 +1,54 @@
+/* Ensure form-group elements are left-aligned */
+.form-group {
+    text-align: left;
+    margin-bottom: 15px;
+  }
+  
+  /* Reset any centering styles applied globally or locally */
+  input, textarea, label {
+    text-align: left; /* Ensure the text within inputs and labels is left-aligned */
+  }
+  
+  /* Optional: Add more specific overrides if there are stronger centering styles */
+  .form-control, .form-group label {
+    text-align: left !important;
+  }
+  .container {
+    margin-top: 20px;
+  }
+  /* styles.css or component-specific CSS file */
+.toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1050;
+  }
+  
+  .toast-success {
+    background-color: #28a745; /* Green */
+    color: white;
+  }
+  
+  .toast-error {
+    background-color: #dc3545; /* Red */
+    color: white;
+  }
+  .table.outer-bordered {
+  border: 1px solid #dee2e6;
+}
+
+/* Remove inner borders */
+.table.outer-bordered thead th,
+.table.outer-bordered tbody td {
+  border: none;
+}
+
+/* Ensure the outer border stands out */
+.table.outer-bordered {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table.outer-bordered thead th {
+  border-bottom: 1px solid #dee2e6;
+}
