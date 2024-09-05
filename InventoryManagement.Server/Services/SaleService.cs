@@ -2,6 +2,7 @@
 using InventoryManagement.Server.Data.Models.ViewModels;
 using InventoryManagement.Server.Data.Models;
 using InventoryManagement.Server.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagement.Server.Services
 {
@@ -18,7 +19,9 @@ namespace InventoryManagement.Server.Services
 
         public List<SaleDTO> GetAllSales()
         {
-            var sales = _context.Sales.ToList();
+            var sales = _context.Sales
+                .Include(p => p.Product)
+                .ToList();
             return _mapper.Map<List<SaleDTO>>(sales);
         }
         public SaleDTO GetSaleById(int id)

@@ -1,4 +1,3 @@
-// charts.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { SaleService } from '../../services/sale-service/sale.service';
@@ -35,6 +34,7 @@ export class ChartsComponent implements OnInit {
       this.purchaseService.getPurchases().subscribe(purchases => {
         this.purchasesData = purchases;
         this.createCombinedChart();
+        this.createProductChart();
         this.isLoading = false;
       });
     });
@@ -71,6 +71,32 @@ export class ChartsComponent implements OnInit {
       const dateB = this.parseDate(b.date);
       return dateA.getTime() - dateB.getTime();
     });
+  }
+
+  mergeAndAggregateDataByProduct(salesData: any[], purchasesData: any[]): any[] {
+    const aggregatedData: { [key: string]: { sales: number, purchases: number } } = {};
+
+    salesData.forEach(item => {
+      const product = item.productName || 'Unknown Product';
+      if (!aggregatedData[product]) {
+        aggregatedData[product] = { sales: 0, purchases: 0 };
+      }
+      aggregatedData[product].sales += item.quantitySold;
+    });
+
+    purchasesData.forEach(item => {
+      const product = item.productName || 'Unknown Product';
+      if (!aggregatedData[product]) {
+        aggregatedData[product] = { sales: 0, purchases: 0 };
+      }
+      aggregatedData[product].purchases += item.quantityPurchased;
+    });
+
+    return Object.keys(aggregatedData).map(product => ({
+      productName: product,
+      sales: aggregatedData[product].sales,
+      purchases: aggregatedData[product].purchases
+    }));
   }
 
   parseDate(dateString: string): Date {
@@ -124,6 +150,59 @@ export class ChartsComponent implements OnInit {
             title: {
               display: true,
               text: 'Amount'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  createProductChart(): void {
+    const mergedDataByProduct = this.mergeAndAggregateDataByProduct(this.salesData, this.purchasesData);
+    const productNames = mergedDataByProduct.map(data => data.productName);
+    const salesQuantities = mergedDataByProduct.map(data => data.sales);
+    const purchaseQuantities = mergedDataByProduct.map(data => data.purchases);
+
+    new Chart('productChart', {
+      type: 'bar',
+      data: {
+        labels: productNames,
+        datasets: [
+          {
+            label: 'Sales Quantity',
+            data: salesQuantities,
+            borderColor: CHART_COLORS.blue,
+            backgroundColor: transparentize(CHART_COLORS.blue, 0.5),
+            borderWidth: 2,
+            borderRadius: 5,
+            borderSkipped: false,
+          },
+          {
+            label: 'Purchases Quantity',
+            data: purchaseQuantities,
+            borderColor: CHART_COLORS.red,
+            backgroundColor: transparentize(CHART_COLORS.red, 0.5),
+            borderWidth: 2,
+            borderRadius: 5,
+            borderSkipped: false,
+          }
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        scales: {
+          x: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Product Names'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Quantity'
             }
           }
         }

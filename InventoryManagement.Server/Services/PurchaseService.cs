@@ -2,6 +2,7 @@
 using InventoryManagement.Server.Data.Models.ViewModels;
 using InventoryManagement.Server.Data.Models;
 using InventoryManagement.Server.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace InventoryManagement.Server.Services
 {
@@ -18,7 +19,10 @@ namespace InventoryManagement.Server.Services
 
         public List<PurchaseDTO> GetAllPurchases()
         {
-            var purchases = _context.Purchases.ToList();
+            var purchases = _context.Purchases
+                .Include(p=>p.Product)
+                .ToList();
+            var t = purchases.Select(s => new { s.ProductId, s.QuantityPurchased });
             return _mapper.Map<List<PurchaseDTO>>(purchases);
         }
         public PurchaseDTO GetPurchaseById(int id)
